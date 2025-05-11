@@ -1,3 +1,5 @@
+import os
+import sys
 import discord
 from discord.ext import commands
 from playwright.async_api import async_playwright  # Changed from sync_playwright
@@ -11,7 +13,7 @@ intents = discord.Intents.default()
 intents.messages = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
-target_channel_id : int = 1370940507127283913  # Replace with your actual channel ID
+target_channel_id : int = 1371205265654943957  # Replace with your actual channel ID
 
 # Global variables for Playwright
 context = None
@@ -72,12 +74,30 @@ async def process_message_from_queue():
             print(f"Found {response_count} response blocks.")
 
             if response_count > 0:
-                latest_response_text = await response_blocks.nth(response_count - 1).inner_text()
+                latest_response_block = response_blocks.nth(response_count - 1)
+                latest_response_text = await latest_response_block.inner_text()
                 print(f"Latest response text retrieved: {latest_response_text}")
-                
+
+                # Check for image elements in the response block
+                image_elements = latest_response_block.locator("img")
+                image_count = await image_elements.count()
+                print(f"Found {image_count} image(s) in the response block.")
+
+                image_urls = []
+                for i in range(image_count):
+                    image_url = await image_elements.nth(i).get_attribute("src")
+                    if image_url:
+                        image_urls.append(image_url+"=s512")
+                        print(f"Image URL found: {image_url}")
+
+                # Prepare the full response text
                 max_length = 1900
                 full_response_text = f"{latest_response_text}"
                 print(f"Full response text length: {len(full_response_text)}")
+
+                # Include image URLs in the response
+                if image_urls:
+                    full_response_text += "\n\nImages:\n" + "\n".join(image_urls)
 
                 if len(full_response_text) <= 2000:
                     print("Response fits within Discord message limit. Sending full response.")
@@ -193,10 +213,8 @@ async def main():
         await page.goto("https://gemini.google.com/") 
         print("Navigation complete. Waiting for page to settle...")
 
-        #load memory and model
-        #locator = input("Enter selector for memory and model: ")
-        locator = 'xpath=//*[@id="conversations-list-0"]/div[1]/div[1]' #tars
-
+        # Load memory and model
+        locator = 'xpath=//*[@id="conversations-list-0"]/div[1]/div[1]'  # Tars
 
         try:
             await page.locator(locator).wait_for(state="visible", timeout=500000)  # Wait for the element to be visible
@@ -218,6 +236,9 @@ async def main():
 # Run both the browser and the bot concurrently
 try:
     asyncio.run(main())
+except Exception as e:
+    print(f"An error occurred: {e}. Restarting the script...")
+    exit(1)
 except KeyboardInterrupt:
     print("Shutting down...")
 finally:
