@@ -97,8 +97,13 @@ async def process_message_from_queue():
 
                 # Include image URLs in the response
                 if image_urls:
-                    full_response_text += "\n\nImages:\n" + "\n".join(image_urls)
+                    # Prepare the response text with labeled clickable links
+                    labeled_links = [f"[Image{i+1}]({url})" for i, url in enumerate(image_urls)]
+                    full_response_text += "\n\nImages:\n" + "\n".join(labeled_links)
 
+                    print("Prepared labeled clickable links for images.")
+
+                # Send the full response text
                 if len(full_response_text) <= 2000:
                     print("Response fits within Discord message limit. Sending full response.")
                     if user_response is not None:
@@ -158,7 +163,7 @@ async def on_message_edit(before : discord.Message, message : discord.Message):
     if message.author.id != 520307592212381699: #nami
         return
     
-    if message.channel.id != 1370940507127283913:
+    
         return
 
     if len(message.content) < 30:
