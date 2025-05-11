@@ -26,6 +26,9 @@ async def process_message_from_queue():
     global page  # Ensure 'page' is accessible if not passed explicitlyab
     while True:
         message, user_response = await message_queue.get()
+        message : discord.Message
+        user_response : discord.Message
+        
         print(f"Processing queued message from {message.author.name}: {message.content}")
         try:
             if not page:
@@ -73,12 +76,15 @@ async def process_message_from_queue():
                 print(f"Latest response text retrieved: {latest_response_text}")
                 
                 max_length = 1900
-                full_response_text = f"{message.author.mention}\n{latest_response_text}"
+                full_response_text = f"{latest_response_text}"
                 print(f"Full response text length: {len(full_response_text)}")
 
                 if len(full_response_text) <= 2000:
                     print("Response fits within Discord message limit. Sending full response.")
-                    await user_response.edit(content=full_response_text)
+                    if user_response is not None:
+                        await user_response.edit(content=full_response_text)
+                    else:
+                        await message.channel.send(full_response_text)
                 else:
                     print("Response exceeds Discord message limit. Splitting into chunks.")
                     first_chunk = full_response_text[:max_length]
@@ -86,7 +92,11 @@ async def process_message_from_queue():
                         first_chunk = first_chunk.rsplit('\n', 1)[0]
                         print(f"First chunk split at newline. Length: {len(first_chunk)}")
                     
-                    await user_response.edit(content=first_chunk)
+                    if user_response is not None:
+                        await user_response.edit(content=first_chunk)
+                    else:
+                        user_response = await message.channel.send(first_chunk)
+                    
                     print("First chunk sent.")
 
                     remaining_text = full_response_text[len(first_chunk):].strip()
@@ -104,7 +114,7 @@ async def process_message_from_queue():
                             print("No more text to send. Breaking loop.")
                             break
                         print(f"Sending chunk of length: {len(chunk_to_send)}")
-                        await message.channel.send(chunk_to_send)
+                        await user_response.reply(chunk_to_send)
                         remaining_text = remaining_text[len(chunk_to_send):].strip()
                         print(f"Remaining text length after sending chunk: {len(remaining_text)}")
             else:
@@ -124,20 +134,22 @@ async def process_message_from_queue():
 async def on_message_edit(before : discord.Message, message : discord.Message):
     if message.author == bot.user or not message.author.bot:
         return
+    
+    if message.author.id != 520307592212381699: #nami
+        return
+    
+    if message.channel.id != 1370940507127283913:
+        return
 
     if len(message.content) < 30:
         return
 
-    print(f"Received message: {message.content} from {message.author.name}. Adding to queue.")
-    # Send an initial response that will be edited later by the worker
-    user_response = await message.channel.send(f"{message.author.mention} Your request has been queued and will be processed shortly...")
-
-    if not page:  # Basic check before queueing
-        await user_response.edit(content=f"{message.author.mention} Playwright page is not initialized. Cannot queue request.")
+    if not page:
+        await message.reply(content=f"{message.author.mention} Playwright page is not initialized. Cannot queue request.")
         print("Error: Playwright page is not initialized in on_message.")
         return
         
-    await message_queue.put((message, user_response))
+    await message_queue.put((message, None))
 
 
 
@@ -151,7 +163,7 @@ async def on_message(message):
 
     print(f"Received message: {message.content} from {message.author.name}. Adding to queue.")
     # Send an initial response that will be edited later by the worker
-    user_response = await message.channel.send(f"{message.author.mention} Your request has been queued and will be processed shortly...")
+    user_response = await message.reply(f"{message.author.mention} Your request has been queued and will be processed shortly...")
 
     if not page:  # Basic check before queueing
         await user_response.edit(content=f"{message.author.mention} Playwright page is not initialized. Cannot queue request.")
@@ -175,7 +187,6 @@ async def main():
 
         print("Navigating to Gemini...")
         # Close all existing pages in the context before navigating
-        # Close all existing pages in the context before navigating
         for existing_page in context.pages:
             if len(context.pages) > 1:
                 await existing_page.close()
@@ -184,10 +195,14 @@ async def main():
 
         #load memory and model
         #locator = input("Enter selector for memory and model: ")
-        await asyncio.sleep(3)  # Wait for the page to load completely
-        locator = 'xpath=//*[@id="conversations-list-0"]/div[1]/div[1]' # tars
+        locator = 'xpath=//*[@id="conversations-list-0"]/div[2]/div[1]' #tars
+
+
         try:
             await page.locator(locator).wait_for(state="visible", timeout=100000)  # Wait for the element to be visible
+            print("Memory and model found. Start initializing...")
+        except TimeoutError:
+            print("Timeout waiting for element to be visible.")
         except Exception as e:
             print(f"Error waiting for element: {e}")
         await page.locator(locator).click()
