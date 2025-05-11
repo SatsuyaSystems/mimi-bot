@@ -45,7 +45,7 @@ async def process_message_from_queue():
             
             print("Chat input located. Clicking...")
             await chat_button.click()
-            print(f"Filling with: {message.author.name}: {message.content}")
+            print(f"Filling with: Person:{message.author.name} ID:<@{message.author.id}> Message:{message.content}")
             await chat_button.fill(f"{message.author.name}: {message.content}")
             print("Pressing Enter...")
             await send_button.click()
@@ -179,7 +179,7 @@ async def main():
 
         context = await p.chromium.launch_persistent_context(
             user_data_dir="user_data",
-            headless=False,
+            headless=True,
             executable_path=brave_path,
             args=["--disable-blink-features=AutomationControlled"],
         )
@@ -195,11 +195,11 @@ async def main():
 
         #load memory and model
         #locator = input("Enter selector for memory and model: ")
-        locator = 'xpath=//*[@id="conversations-list-0"]/div[2]/div[1]' #tars
+        locator = 'xpath=//*[@id="conversations-list-0"]/div[1]/div[1]' #tars
 
 
         try:
-            await page.locator(locator).wait_for(state="visible", timeout=100000)  # Wait for the element to be visible
+            await page.locator(locator).wait_for(state="visible", timeout=500000)  # Wait for the element to be visible
             print("Memory and model found. Start initializing...")
         except TimeoutError:
             print("Timeout waiting for element to be visible.")
