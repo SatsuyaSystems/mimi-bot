@@ -212,7 +212,7 @@ async def main():
 
         context = await p.chromium.launch_persistent_context(
             user_data_dir="user_data",
-            headless=True,
+            headless=False,
             executable_path=brave_path,
             args=["--disable-blink-features=AutomationControlled"],
         )
