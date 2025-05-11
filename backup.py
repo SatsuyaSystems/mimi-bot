@@ -1,0 +1,160 @@
+import discord
+from discord.ext import commands
+from playwright.async_api import async_playwright  # Changed from sync_playwright
+import asyncio
+
+# Global message queue
+message_queue = asyncio.Queue()
+
+# Discord bot setup
+intents = discord.Intents.default()
+intents.messages = True
+intents.message_content = True
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+# Global variables for Playwright
+context = None
+page = None
+
+@bot.event
+async def on_ready():
+    print(f"Logged in as {bot.user}")
+
+async def process_message_from_queue():
+    """Processes messages from the queue one by one."""
+    global page  # Ensure 'page' is accessible if not passed explicitlyab
+    while True:
+        message, user_response = await message_queue.get()
+        print(f"Processing queued message from {message.author.name}: {message.content}")
+        try:
+            if not page:
+                await user_response.edit(content=f"{message.author.mention} Playwright page is not initialized. Cannot process request.")
+                print("Error: Playwright page is not initialized in worker.")
+                message_queue.task_done()
+                continue
+
+            chat_input_selector = '#app-root > main > side-navigation-v2 > bard-sidenav-container > bard-sidenav-content > div.content-wrapper > div > div.content-container > chat-window > div > input-container > div > input-area-v2 > div > div > div.text-input-field_textarea-wrapper.ng-tns-c3280767446-3 > div > div > rich-textarea > div.ql-editor.ql-blank.textarea.new-input-ui'
+            send_button_selector = '#app-root > main > side-navigation-v2 > bard-sidenav-container > bard-sidenav-content > div.content-wrapper > div > div.content-container > chat-window > div > input-container > div > input-area-v2 > div > div > div.trailing-actions-wrapper.ng-tns-c3280767446-3 > div > div.mat-mdc-tooltip-trigger.send-button-container.ng-tns-c3280767446-3.inner.ng-star-inserted.visible > button'
+            print(f"Attempting to locate chat input with selector: {chat_input_selector}")
+            chat_button = page.locator(chat_input_selector)
+            send_button = page.locator(send_button_selector)
+            
+            print("Chat input located. Clicking...")
+            await chat_button.click()
+            print(f"Filling with: {message.author.name}: {message.content}")
+            await chat_button.fill(f"{message.author.name}: {message.content}")
+            print("Pressing Enter...")
+            await send_button.click()
+            print("Waiting for response...")
+            response_blocks_selector = '//message-content[contains(@class, "model-response-text")]'
+            print(f"Locating response blocks with selector: {response_blocks_selector}")
+            response_blocks = page.locator(response_blocks_selector)
+            print("Waiting for response blocks to appear...")
+            mic_button_selector = '#app-root > main > side-navigation-v2 > bard-sidenav-container > bard-sidenav-content > div.content-wrapper > div > div.content-container > chat-window > div > input-container > div > input-area-v2 > div > div > div.trailing-actions-wrapper.ng-tns-c3280767446-3 > div > div.mic-button-container.ng-tns-c3280767446-3.ng-trigger.ng-trigger-slide.ng-star-inserted > speech-dictation-mic-button > button'
+            mic = page.locator(mic_button_selector)
+            
+            await asyncio.sleep(1) 
+            try:
+                await mic.first.wait_for(state="visible", timeout=100000) 
+            except Exception as e:
+                print(f"Timeout or error waiting for response indicator (mic button): {e}")
+                await user_response.edit(content=f"{message.author.mention} Timed out waiting for a response from Gemini.")
+                message_queue.task_done()
+                continue
+
+            response_count = await response_blocks.count()
+            print(f"Found {response_count} response blocks.")
+
+            if response_count > 0:
+                latest_response_text = await response_blocks.nth(response_count - 1).inner_text()
+                print(f"Latest response: {latest_response_text}")
+                
+                max_length = 1900 
+                full_response_text = f"{message.author.mention}\n{latest_response_text}"
+                
+                if len(full_response_text) <= 2000:
+                    await user_response.edit(content=full_response_text)
+                else:
+                    first_chunk = full_response_text[:max_length]
+                    if '\n' in first_chunk:
+                        first_chunk = first_chunk.rsplit('\n', 1)[0]
+                    
+                    await user_response.edit(content=first_chunk)
+                    
+                    remaining_text = full_response_text[len(first_chunk):].strip()
+                    
+                    while remaining_text:
+                        chunk_to_send = remaining_text[:max_length]
+                        if '\n' in chunk_to_send and len(remaining_text) > max_length:
+                            split_pos = chunk_to_send.rfind('\n')
+                            if split_pos > 0 :
+                                 chunk_to_send = chunk_to_send[:split_pos]
+                        
+                        if not chunk_to_send.strip():
+                            break
+                        await message.channel.send(chunk_to_send)
+                        remaining_text = remaining_text[len(chunk_to_send):].strip()
+            else:
+                print("No response found after interaction.")
+                await user_response.edit(content=f"{message.author.mention} No response found.")
+
+        except Exception as e:
+            print(f"An error occurred processing queued message: {e}")
+            try:
+                await user_response.edit(content=f"{message.author.mention} An error occurred: {e}")
+            except Exception as discord_e:
+                print(f"Failed to send error to Discord: {discord_e}")
+        finally:
+            message_queue.task_done()
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    target_channel_id = 1370940507127283913  # Replace with your actual channel ID
+    if message.channel.id != target_channel_id:
+        return
+
+    print(f"Received message: {message.content} from {message.author.name}. Adding to queue.")
+    # Send an initial response that will be edited later by the worker
+    user_response = await message.channel.send(f"{message.author.mention} Your request has been queued and will be processed shortly...")
+
+    if not page:  # Basic check before queueing
+        await user_response.edit(content=f"{message.author.mention} Playwright page is not initialized. Cannot queue request.")
+        print("Error: Playwright page is not initialized in on_message.")
+        return
+        
+    await message_queue.put((message, user_response))
+
+async def main():
+    global page, context 
+    async with async_playwright() as p:
+        brave_path = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
+
+        context = await p.chromium.launch_persistent_context(
+            user_data_dir="user_data",
+            headless=False,
+            executable_path=brave_path,
+            args=["--disable-blink-features=AutomationControlled"],
+        )
+        page = await context.new_page() 
+
+        print("Navigating to Gemini...")
+        await page.goto("https://gemini.google.com/") 
+        print("Navigation complete. Waiting for page to settle...")
+
+        # Start the message processing worker task
+        asyncio.create_task(process_message_from_queue())
+        print("Message processing queue worker started.")
+
+        print("Starting Discord bot...")
+        await bot.start("MTM3MTExMDg4MjI5MzMyMTgxOA.GvGK62.CG1fmF0QOZY5-si1UTb0dDzNVET4nLOZoYkLHc")  # Replace with your bot token
+
+# Run both the browser and the bot concurrently
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    print("Shutting down...")
+finally:
+    pass
