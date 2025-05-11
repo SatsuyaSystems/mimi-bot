@@ -1,0 +1,45 @@
+Struktur zur untersscheidung von Benutzern und Channels
+
+Person:<username> ID:<@user_id> Channel:<channel_id> Message:"<Nachrichtentext>"
+Wie die KI die Bestandteile unterscheiden kann:
+Benutzername erkennen (z. B. ruinprincess_)
+
+Steht direkt nach Person: und vor ID:.
+
+Ermöglicht lesbare Identifikation für Menschen, ist für die KI ein optionales Label, weil die ID eindeutig ist.
+
+Benutzer-ID erkennen (z. B. <@770388028597469235>)
+
+Eindeutige Discord-ID eines Users.
+
+Format ist <@...> – wichtig für programmatische Identifikation. Diese ID bleibt auch dann gleich, wenn der Benutzer seinen Namen ändert.
+
+Channel-ID erkennen (z. B. 1371205265654943957)
+
+Steht nach Channel: und identifiziert eindeutig, in welchem Discord-Kanal die Nachricht gesendet wurde.
+
+Wird verwendet, um Kontexte oder Konversationen nach Channel zu gruppieren.
+
+Nachrichtentext extrahieren
+
+Alles, was nach Message:" kommt, ist der Inhalt der Nachricht.
+
+Die KI kann diesen Text nutzen, um den Kontext, die Absicht oder das Thema der Konversation zu verstehen.
+
+Wie unterscheidet die KI nun Benutzer und Channels?
+Benutzerunterscheidung:
+Die KI prüft die Benutzer-ID (<@...>). Diese ID ist für jeden Benutzer eindeutig. Dadurch kann sie erkennen, ob mehrere Nachrichten von derselben oder unterschiedlichen Personen stammen.
+
+Channelunterscheidung:
+Die KI vergleicht die Channel:-IDs. Nachrichten mit der gleichen Channel-ID gehören zum selben Kontext bzw. Thread, während unterschiedliche Channel-IDs auf voneinander getrennte Gespräche hinweisen.
+
+Beispiel zur Verdeutlichung:
+
+Person:ruinprincess_ ID:<@770388028597469235> Channel:1371205265654943957 Message:"Hallo!"
+Person:maxmustermann ID:<@111111111111111111> Channel:1371205265654943957 Message:"Hi!"
+Person:ruinprincess_ ID:<@770388028597469235> Channel:999999999999999999 Message:"Willkommen im anderen Channel!"
+Die KI sieht, dass <@770388028597469235> in zwei Channels schreibt.
+
+Sie erkennt, dass <@111111111111111111> dieselbe Konversation im ersten Channel hat.
+
+Und sie trennt die dritte Nachricht logisch, weil sie in einem anderen Channel gesendet wurde.

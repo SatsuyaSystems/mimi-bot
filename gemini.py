@@ -13,7 +13,15 @@ intents = discord.Intents.default()
 intents.messages = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
-target_channel_id : int = 1371205265654943957  # Replace with your actual channel ID
+target_channel_id = [1370940507127283913, 1371205265654943957]
+"""
+1371205265654943957 = private channel
+1370940507127283913 = public channel
+"""
+
+def isTargetChannelId(channel_id : int) -> bool:
+    """Check if the channel ID is in the target list."""
+    return channel_id in target_channel_id
 
 # Global variables for Playwright
 context = None
@@ -47,8 +55,8 @@ async def process_message_from_queue():
             
             print("Chat input located. Clicking...")
             await chat_button.click()
-            print(f"Filling with: Person:{message.author.name} ID:<@{message.author.id}> Message:{message.content}")
-            await chat_button.fill(f"{message.author.name}: {message.content}")
+            print(f"Filling with: Person:{message.author.name} ID:<@{message.author.id}> Channel:{message.channel.id} Message:{message.content}")
+            await chat_button.fill(f"Person:{message.author.name} ID:<@{message.author.id}> Channel:{message.channel.id} Message:{message.content}")
             print("Pressing Enter...")
             await send_button.click()
             print("Waiting for response...")
@@ -183,7 +191,7 @@ async def on_message(message):
     if message.author == bot.user or message.author.bot:
         return
     
-    if message.channel.id != target_channel_id:
+    if not isTargetChannelId(message.channel.id):
         return
 
     print(f"Received message: {message.content} from {message.author.name}. Adding to queue.")
