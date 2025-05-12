@@ -4,6 +4,13 @@ import discord
 from discord.ext import commands
 from playwright.async_api import async_playwright  # Changed from sync_playwright
 import asyncio
+import pytz
+import datetime
+def get_german_time():
+    """Returns the current German time in hh:mm format."""
+    german_timezone = pytz.timezone("Europe/Berlin")
+    german_time = datetime.datetime.now(german_timezone)
+    return german_time.strftime("%H:%M")
 
 # Global message queue
 message_queue = asyncio.Queue()
@@ -41,6 +48,9 @@ async def process_message_from_queue():
         
         print(f"Processing queued message from {message.author.name}: {message.content}")
         try:
+            # Indicate that the bot is typing in the channel
+            async with message.channel.typing():
+                print("Bot is typing...")
             if not page:
                 await user_response.edit(content=f"{message.author.mention} Playwright page is not initialized. Cannot process request.")
                 print("Error: Playwright page is not initialized in worker.")
@@ -55,8 +65,9 @@ async def process_message_from_queue():
             
             print("Chat input located. Clicking...")
             await chat_button.click()
-            print(f"Filling with: Person:{message.author.name} ID:<@{message.author.id}> Channel:{message.channel.id} Message:{message.content}")
-            await chat_button.fill(f"Person:{message.author.name} ID:<@{message.author.id}> Channel:{message.channel.id} Message:{message.content}")
+            content = f"Filling with: Person:{message.author.name} | ID:<@{message.author.id}> | Channel:{message.channel.id} | Time:{get_german_time()} | Message:{message.content}"
+            print(content)
+            await chat_button.fill(content)
             print("Pressing Enter...")
             await send_button.click()
             print("Waiting for response...")
@@ -117,7 +128,7 @@ async def process_message_from_queue():
                     if user_response is not None:
                         await user_response.edit(content=full_response_text)
                     else:
-                        await message.channel.send(full_response_text)
+                        await message.reply(full_response_text)
                 else:
                     print("Response exceeds Discord message limit. Splitting into chunks.")
                     first_chunk = full_response_text[:max_length]
@@ -128,7 +139,7 @@ async def process_message_from_queue():
                     if user_response is not None:
                         await user_response.edit(content=first_chunk)
                     else:
-                        user_response = await message.channel.send(first_chunk)
+                        user_response = await message.reply(first_chunk)
                     
                     print("First chunk sent.")
 
@@ -163,32 +174,10 @@ async def process_message_from_queue():
         finally:
             message_queue.task_done()
 
-@bot.event
-async def on_message_edit(before : discord.Message, message : discord.Message):
-    if message.author == bot.user or not message.author.bot:
-        return
-    
-    if message.author.id != 520307592212381699: #nami
-        return
-    
-    
-        return
-
-    if len(message.content) < 30:
-        return
-
-    if not page:
-        await message.reply(content=f"{message.author.mention} Playwright page is not initialized. Cannot queue request.")
-        print("Error: Playwright page is not initialized in on_message.")
-        return
-        
-    await message_queue.put((message, None))
-
-
 
 @bot.event
 async def on_message(message):
-    if message.author == bot.user or message.author.bot:
+    if message.author.bot and message.author.id != 520307592212381699:
         return
     
     if not isTargetChannelId(message.channel.id):
@@ -196,14 +185,10 @@ async def on_message(message):
 
     print(f"Received message: {message.content} from {message.author.name}. Adding to queue.")
     # Send an initial response that will be edited later by the worker
-    user_response = await message.reply(f"{message.author.mention} Your request has been queued and will be processed shortly...")
+    #user_response = await message.reply(f"{message.author.mention} Your request has been queued and will be processed shortly...")
 
-    if not page:  # Basic check before queueing
-        await user_response.edit(content=f"{message.author.mention} Playwright page is not initialized. Cannot queue request.")
-        print("Error: Playwright page is not initialized in on_message.")
-        return
         
-    await message_queue.put((message, user_response))
+    await message_queue.put((message, None))
 
 async def main():
     global page, context 
