@@ -1,7 +1,4 @@
 @echo off
-REM Lade update.bat
-update.bat
-
 REM Aktiviert die virtuelle Umgebung
 call venv\Scripts\activate
 
