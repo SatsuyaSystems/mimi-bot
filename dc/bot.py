@@ -1,3 +1,4 @@
+import logging
 import discord
 from discord.ext import commands
 from core.handlers import message_queue
@@ -17,27 +18,30 @@ bot = g_data.get_or_create(
     intents=intents,
 )
 
-target_channel_id = [1370940507127283913, 1371601242417135698]
+target_channel = [int(bot_id) for bot_id in g_data.get("cfg").data['discord']['target_channel']]
+allowed_bots = [int(bot_id) for bot_id in g_data.get("cfg").data['discord']['allowed_bots']]
 
-def isTargetChannelId(channel_id : int) -> bool:
+def isTargetChannelId(id) -> bool:
     """Check if the channel ID is in the target list."""
-    return channel_id in target_channel_id
+    if id in target_channel:
+        return True
+    else:
+        return False
 
 @bot.event
 async def on_ready():
-    print(f"Logged in as {bot.user}")
+    logging.info(f"Logged in as {bot.user}")
 
 @bot.event
 async def on_message(message):
     """Handle incoming messages."""
-    allowed_bots = [int(bot_id) for bot_id in g_data.get("cfg").data['discord']['allowed_bots']]
     if message.author.bot and message.author.id not in allowed_bots:
         return
-    
+
     if not isTargetChannelId(message.channel.id):
         return
 
-    print(f"Received message: {message.content} from {message.author.name}. Adding to queue.")
+    logging.info(f"Discord message from {message.author.name}. Adding to queue.")
     data = {
         "content": message.content,
         "username": message.author.name,
@@ -50,6 +54,6 @@ async def on_message(message):
         # Check if the message is already in the queue
         queue_items = list(message_queue._queue)
         if any(item["messageid"] == message.id for item in queue_items):
-            print("Message is already in the queue. Skipping.")
+            logging.info("Discord message is already in the queue. Skipping.")
             return
         await message_queue.put((data))

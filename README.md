@@ -11,13 +11,15 @@ Mimi-Bot is a Discord bot interface for interacting with Google's Gemini AI, des
   - Asynchronous I/O with asyncio
   - Rate limiting and error handling
 - **Modular Architecture**: Core system with plugin-ready structure
+- **Configuration Management**: YAML-based config system
+- **Logging**: Comprehensive logging system in logs/ directory
 
 ## Requirements
 
 - Python 3.8+
 - Discord bot token
 - Google account credentials
-- Packages: `requirements.txt`
+- Packages: See `requirements.txt`
 
 ## Installation & Setup
 
@@ -28,7 +30,8 @@ cd gemini_bot
 # Install dependencies
 setup.bat
 
-# Launch App
+# Configure your settings (see Configuration section below)
+# Then launch the app
 start.bat
 ```
 
@@ -36,37 +39,62 @@ start.bat
 
 ```
 mimi-bot/
+├── config/            # Configuration files
+│   ├── __init__.py
+│   ├── config.yml     # Main configuration
+│   └── configurationFile.py
 ├── core/              # Core functionality
+│   ├── __init__.py
 │   ├── automation.py  # Task automation handlers
 │   ├── callback.py    # Event callback system
-│   └── handlers.py    # Message processing logic
+│   ├── handlers.py    # Message processing logic
+│   └── utils.py       # Utility functions
 ├── dc/                # Discord integration
+│   ├── __init__.py
 │   └── bot.py         # Discord client implementation
 ├── lib/               # Shared utilities
+│   ├── __init__.py
 │   └── global_registry.py  # Service registry
+├── logs/              # Application logs
 ├── user_data/         # User-specific storage
 ├── validation/        # Security configurations
 │   ├── communication.txt
 │   └── uservalidation.txt
 ├── main.py            # Entry point
 ├── requirements.txt   # Dependencies
-└── *.bat              # Windows management scripts
+├── setup.bat          # Setup script
+└── start.bat          # Launch script
 ```
 
 ## Configuration
 
 1. **Discord Setup**:
    - Create bot at https://discord.com/developers
-   - Add token to main.py:
+   - Get your bot token and other ids
+   - Edit config/config.yml:
+     ```yaml
+     discord:
+         bot_token: "YOUR_DISCORD_TOKEN"
+         allowed_bots: #allowed bots (capture message)
+            - "id"
+            - "id"
+         target_channel: #target_channel (capture message)
+            - "id"
+            - "id"
+     ```
 
-2. **Gemini Setup**:
-   - Hold your credentials ready
-   - start the application and login. Then restart.
 
+3. **First Run**:
+   - The bot will create necessary directories and files
+   - Check logs/ for initialization messages
 
 ## Usage
 
+### Basic Commands
 ```bash
-# Start normally
+# Start the bot normally
 start.bat
+
+# Run in debug mode (verbose logging)
+start.bat --debug
 ```

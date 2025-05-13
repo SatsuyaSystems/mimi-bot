@@ -1,5 +1,6 @@
 from playwright.async_api import async_playwright
 import asyncio
+import logging
 
 # Global browser context and page
 context = None
@@ -32,7 +33,7 @@ async def initialize_browser():
             await page.locator(locator).click()
             break
         except Exception as e:
-            print(f"Browser initialization error: {e}")
+            logging.info(f"Browser initialization error: {e}")
             await asyncio.sleep(5)
 
 async def send_to_website(content: str):
@@ -49,9 +50,8 @@ async def wait_for_response():
     await page.locator(mic_selector).wait_for(state="visible", timeout=500000)
     response_blocks = page.locator(response_selector)
     response_count = await response_blocks.count()
-    print(f"Found {response_count} response blocks.")
+    logging.info(f"Found {response_count} response blocks.")
     if response_count > 0:
         latest_response_block = response_blocks.nth(response_count - 1)
         latest_response_text = await latest_response_block.inner_text()
-        print(f"Latest response text retrieved: {latest_response_text}")
         return latest_response_text

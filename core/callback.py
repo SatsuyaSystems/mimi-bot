@@ -4,6 +4,7 @@ The callbacks are used to handle the data to be returned to the connectors
 
 """
 import discord
+import logging
 from lib.global_registry import g_data
 
 async def mimi_callback(callback_object):
@@ -12,6 +13,7 @@ async def mimi_callback(callback_object):
     This function is called when the Mimi connector is triggered.
     It processes the data and sends the result in chunks if necessary.
     """
+    logging.info("Mimi callback triggered.")
     messageId = callback_object['messageid']
     channelId = callback_object['channel']
     content = callback_object['responce']
