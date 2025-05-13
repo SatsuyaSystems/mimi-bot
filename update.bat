@@ -27,4 +27,3 @@ if %errorlevel% neq 0 (
 
 rem --- Pause to keep the window open after execution ---
 echo.
-pause
