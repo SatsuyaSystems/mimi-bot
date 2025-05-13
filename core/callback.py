@@ -56,7 +56,7 @@ async def search_callback(callback_object):
     This function is called when the search connector is triggered.
     It processes the data and returns the result.
     """
-    if callback_object['host'] == "mimi":
+    if callback_object['host'] == "Discord":
         # Process data for Mimi connector
         data = await mimi_callback(callback_object)
     

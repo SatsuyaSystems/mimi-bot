@@ -17,7 +17,7 @@ bot = g_data.get_or_create(
     intents=intents,
 )
 
-target_channel_id = [1370940507127283913, 1371205265654943957]
+target_channel_id = [1370940507127283913, 1371601242417135698]
 
 def isTargetChannelId(channel_id : int) -> bool:
     """Check if the channel ID is in the target list."""
@@ -29,7 +29,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if message.author.bot and message.author.id != 520307592212381699:
+    if message.author.bot and message.author.id != 590851927621894157:
         return
     
     if not isTargetChannelId(message.channel.id):
@@ -42,7 +42,7 @@ async def on_message(message):
         "channel": message.channel.id,
         "userid": message.author.id,
         "messageid": message.id,
-        "host": "mimi",
+        "host": "Discord",
     }
     async with message.channel.typing():
         await message_queue.put((data))
