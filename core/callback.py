@@ -5,6 +5,7 @@ The callbacks are used to handle the data to be returned to the connectors
 """
 import discord
 import logging
+import os
 from lib.global_registry import g_data
 
 async def mimi_callback(callback_object):
@@ -17,6 +18,7 @@ async def mimi_callback(callback_object):
     messageId = callback_object['messageid']
     channelId = callback_object['channel']
     content = callback_object['responce']
+    image_path = callback_object.get('image')  # Get the image path if it exists
 
     # Get the bot instance and channel/message references
     bot = g_data.get("discord_bot")
@@ -51,6 +53,20 @@ async def mimi_callback(callback_object):
 
             await src_message.reply(chunk_to_send)  # Send the chunk
             remaining_text = remaining_text[len(chunk_to_send):].strip()  # Update remaining text
+
+    # Check if there is an image to upload
+    if image_path:
+        if os.path.exists(image_path):
+            logging.info(f"Uploading image: {image_path} to channel {channelId}")
+            try:
+                await src_channel.send(file=discord.File(image_path))
+                logging.info("Image uploaded successfully.")
+                os.remove(image_path)  # Remove the image after sending
+                logging.info(f"Image {image_path} removed after upload.")
+            except Exception as e:
+                logging.error(f"Failed to upload image: {e}")
+        else:
+            logging.warning(f"Image path does not exist: {image_path}")
 
 async def search_callback(callback_object):
     """

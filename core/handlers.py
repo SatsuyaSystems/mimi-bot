@@ -19,12 +19,13 @@ async def process_message_from_queue():
             await send_to_website(formatted_content)
             
             # Wait for and process response
-            response = await wait_for_response()
+            response, image = await wait_for_response()
             logging.info("Response received from website.")
             
             callback_object = {
                 "host": message['host'],
                 "responce": response,
+                "image": image,
                 "messageid": message['messageid'],
                 "channel": message['channel'],
                 "userid": message['userid'],

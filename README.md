@@ -6,6 +6,7 @@ Mimi-Bot is a Discord bot interface for interacting with Google's Gemini AI, des
 
 - **Multi-Platform Integration**: Discord interface with extensible adapter architecture
 - **AI-Powered Processing**: Leverages Google's Gemini for intelligent responses
+- **Image Generation**: Leverages Google's Gemini for image generation
 - **Efficient Communication**:
   - Chunked message handling for Discord limits
   - Asynchronous I/O with asyncio
