@@ -68,6 +68,8 @@ async def mimi_callback(callback_object):
         else:
             logging.warning(f"Image path does not exist: {image_path}")
 
+    logging.info("Mimi callback processing completed.")
+
 async def search_callback(callback_object):
     """
     Callback function for search connector.
