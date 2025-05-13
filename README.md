@@ -75,14 +75,16 @@ mimi-bot/
    - Get your bot token and other ids
    - Edit config/config.yml:
      ```yaml
-     discord:
-         bot_token: "YOUR_DISCORD_TOKEN"
-         allowed_bots: #allowed bots (capture message)
-            - "id"
-            - "id"
-         target_channel: #target_channel (capture message)
-            - "id"
-            - "id"
+discord:
+  bot_token: ""
+  allowed_bots:
+    - ""
+    - ""
+  target_channel:
+    - "1370940507127283913"
+    - "1371601242417135698"
+    - "1371815158149812244"
+
      ```
 
 
