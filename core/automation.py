@@ -30,7 +30,7 @@ async def initialize_browser():
                     await existing_page.close()
             await page.goto("https://gemini.google.com/")
             locator = 'xpath=//*[@id="conversations-list-0"]/div[1]/div[1]'
-            await page.locator(locator).wait_for(state="visible", timeout=500000)
+            await page.locator(locator).wait_for(state="visible", timeout=5000000)
             await page.locator(locator).click()
             break
         except Exception as e:
