@@ -20,6 +20,7 @@ Mimi-Bot is a Discord bot interface for interacting with Google's Gemini AI, des
 - Python 3.8+
 - Discord bot token
 - Google account credentials
+- Brave Browser (if on linux change path in core/automation.py)
 - Packages: See `requirements.txt`
 
 ## Installation & Setup
