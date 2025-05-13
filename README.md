@@ -74,7 +74,7 @@ mimi-bot/
    - Create bot at https://discord.com/developers
    - Get your bot token and other ids
    - Edit config/config.yml:
-     ```yaml
+```yaml
 discord:
   bot_token: ""
   allowed_bots:
@@ -85,7 +85,7 @@ discord:
     - "1371601242417135698"
     - "1371815158149812244"
 
-     ```
+```
 
 
 3. **First Run**:
