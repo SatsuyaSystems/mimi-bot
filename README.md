@@ -64,7 +64,8 @@ mimi-bot/
 ├── main.py            # Entry point
 ├── requirements.txt   # Dependencies
 ├── setup.bat          # Setup script
-└── start.bat          # Launch script
+├── start.bat          # Launch script
+└── update.bat          # Executes git pull -v
 ```
 
 ## Configuration
