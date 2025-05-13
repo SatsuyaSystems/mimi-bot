@@ -29,11 +29,11 @@ git clone git@github.com:ZeroLikes/gemini_bot.git
 cd gemini_bot
 
 # Install dependencies
-setup.bat
+setup.bat or setup.sh on linux
 
 # Configure your settings (see Configuration section below)
 # Then launch the app
-start.bat
+start.bat or start.sh on linux
 ```
 
 ## Project Structure
@@ -95,8 +95,5 @@ mimi-bot/
 ### Basic Commands
 ```bash
 # Start the bot normally
-start.bat
-
-# Run in debug mode (verbose logging)
-start.bat --debug
+start.bat or start.sh on linux
 ```
