@@ -37,16 +37,15 @@ async def initialize_browser():
 
 async def send_to_website(content: str):
     """Core function to send content to website"""
-    chat_input_selector = '#app-root > main > side-navigation-v2 > bard-sidenav-container > bard-sidenav-content > div.content-wrapper > div > div.content-container > chat-window > div > input-container > div > input-area-v2 > div > div > div.text-input-field_textarea-wrapper.ng-tns-c1933791834-3 > div > div > rich-textarea'
-                
-    await page.type(selector=chat_input_selector ,delay=0, text=content)
-    await page.press(selector=chat_input_selector, delay=0, key="Enter")
-
+    chat_input_selector = '//div[contains(@class, "textarea new-input-ui")]'
+    chat_input = page.locator(chat_input_selector)
+    await chat_input.fill(content)
+    send_button_selector = '//button[contains(@class, "send-button")]'
+    await page.locator(send_button_selector).click()
 async def wait_for_response():
     """Wait for and return website response"""
-    response_selector = '//message-content[contains(@class, "model-response-text")]'
-    mic_selector = '#app-root > main > side-navigation-v2 > bard-sidenav-container > bard-sidenav-content > div.content-wrapper > div > div.content-container > chat-window > div > input-container > div > input-area-v2 > div > div > div.trailing-actions-wrapper.ng-tns-c1933791834-3 > div > div.mic-button-container.ng-tns-c1933791834-3.ng-trigger.ng-trigger-slide.ng-star-inserted > speech-dictation-mic-button > button > div > mat-icon'
-    
+    response_selector = '//message-content'
+    mic_selector = 'xpath=//*[@id="app-root"]/main/side-navigation-v2/bard-sidenav-container/bard-sidenav-content/div[2]/div/div[2]/chat-window/div/input-container/div/input-area-v2/div/div/div[3]/div/div[1]/speech-dictation-mic-button/button/div/mat-icon'
     await page.locator(mic_selector).wait_for(state="visible", timeout=500000)
     response_blocks = page.locator(response_selector)
     response_count = await response_blocks.count()

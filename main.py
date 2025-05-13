@@ -1,4 +1,5 @@
 from lib.global_registry import g_data
+from config.configurationFile import ConfigurationFile
 
 # Global message queue
 import asyncio
@@ -6,6 +7,7 @@ message_queue = g_data.get_or_create(
     "message_queue",
     asyncio.Queue
 )
+cfg : ConfigurationFile = g_data.get_or_create("cfg", ConfigurationFile, "config\config.yml")
 
 from dc.bot import bot
 from core.automation import initialize_browser
@@ -19,7 +21,7 @@ async def main():
     asyncio.create_task(process_message_from_queue())
     print("Message processing queue worker started.")
     # Start the Discord bot
-    await bot.start("MTM3MTExMDg4MjI5MzMyMTgxOA.GvGK62.CG1fmF0QOZY5-si1UTb0dDzNVET4nLOZoYkLHc")
+    await bot.start(g_data.get("cfg").data['discord']['bot_token'])
     print("Discord bot started.")
 
 # Run both the browser and the bot concurrently

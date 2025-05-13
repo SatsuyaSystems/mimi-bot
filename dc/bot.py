@@ -29,7 +29,9 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if message.author.bot and message.author.id != 590851927621894157:
+    """Handle incoming messages."""
+    allowed_bots = [int(bot_id) for bot_id in g_data.get("cfg").data['discord']['allowed_bots']]
+    if message.author.bot and message.author.id not in allowed_bots:
         return
     
     if not isTargetChannelId(message.channel.id):
@@ -45,4 +47,9 @@ async def on_message(message):
         "host": "Discord",
     }
     async with message.channel.typing():
+        # Check if the message is already in the queue
+        queue_items = list(message_queue._queue)
+        if any(item["messageid"] == message.id for item in queue_items):
+            print("Message is already in the queue. Skipping.")
+            return
         await message_queue.put((data))
