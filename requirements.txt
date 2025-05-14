@@ -4,4 +4,4 @@ pytz==2023.3
 aiohttp==3.8.5
 playwright==1.37.0
 asyncio==3.4.3
-pyyaml==6.0.2
+PyYAML==6.0.2
