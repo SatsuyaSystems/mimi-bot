@@ -1,0 +1,6 @@
+discord:
+  bot_token: "token" # Bot Token
+  allowed_bots: # Bots that passthough the message event and can submit messages
+    - "12345678910"
+  target_channel: # Channel where the bots listens
+    - "13709483913" # Public channel
