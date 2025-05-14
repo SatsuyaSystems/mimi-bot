@@ -21,7 +21,14 @@ Mimi-Bot is a Discord bot interface for interacting with Google's Gemini AI, des
 - Discord bot token
 - Google account credentials
 - Brave Browser (if on linux change path in core/automation.py)
+- VisualStudio Buildtools
 - Packages: See `requirements.txt`
+
+https://www.python.org/
+https://brave.com/de/
+https://git-scm.com/
+https://download.visualstudio.microsoft.com/download/pr/f50ab15d-99d5-43aa-b0b4-496b6cb1e574/0b8c50b67343e7b02749da84af6cdf02725ba43307fde4178274a274dcad0664/vs_BuildTools.exe
+
 
 ## Installation & Setup
 
