@@ -35,6 +35,10 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     """Handle incoming messages."""
+    # check if bot is mentioned
+    if bot.user not in message.mentions:
+        return
+
     if message.author.bot and message.author.id not in allowed_bots:
         return
 
