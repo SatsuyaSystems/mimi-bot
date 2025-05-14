@@ -37,13 +37,12 @@ async def on_message(message):
     """Handle incoming messages."""
     # check if bot is mentioned
     if bot.user not in message.mentions:
-        return
+        if not isTargetChannelId(message.channel.id):
+            return
 
     if message.author.bot and message.author.id not in allowed_bots:
         return
 
-    if not isTargetChannelId(message.channel.id):
-        return
 
     logging.info(f"Discord message from {message.author.name}. Adding to queue.")
     data = {
