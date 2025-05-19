@@ -1,6 +1,9 @@
 import logging
 from typing import Any, Callable, Dict, Optional
 
+# Use a logger specific to this module
+logger = logging.getLogger(__name__)
+
 class GlobalRegistry:
     """
     Eine einfache Registry zur Verwaltung global geteilter Singleton-Instanzen.
@@ -22,7 +25,7 @@ class GlobalRegistry:
         
         self._registry: Dict[str, Any] = {}
         self._initialized = True
-        logging.info("GlobalRegistry initialized.")
+        logger.info("GlobalRegistry initialized.")
 
     def get_or_create(self, key: str, instance_factory: Callable[[], Any], *factory_args, **factory_kwargs) -> Any:
         """
@@ -42,17 +45,17 @@ class GlobalRegistry:
             Any: Die existierende oder neu erstellte Instanz.
         """
         if key not in self._registry:
-            logging.info(f"Creating new instance for key '{key}'...")
+            logger.info(f"Creating new instance for key '{key}'...")
             try:
                 # Erstelle die Instanz nur, wenn sie nicht im Registry ist
                 self._registry[key] = instance_factory(*factory_args, **factory_kwargs)
-                logging.info(f"Instance created and registered for key '{key}'.")
+                logger.info(f"Instance created and registered for key '{key}'.")
             except Exception as e:
-                 logging.error(f"Failed to create instance for key '{key}': {e}", exc_info=True)
+                 logger.error(f"Failed to create instance for key '{key}': {e}", exc_info=True)
                  # Fehler weitergeben, damit die Anwendung merkt, dass etwas schiefgelaufen ist
                  raise
         else:
-            logging.debug(f"Returning existing instance for key '{key}'.")
+            logger.debug(f"Returning existing instance for key '{key}'.")
 
         return self._registry[key]
 
@@ -75,25 +78,25 @@ class GlobalRegistry:
     def clear_key(self, key: str):
         """Entfernt einen Schlüssel und die zugehörige Instanz aus der Registry."""
         if key in self._registry:
-            logging.info(f"Removing instance for key '{key}' from registry.")
+            logger.info(f"Removing instance for key '{key}' from registry.")
             # Optional: Prüfen, ob die Instanz eine close() Methode hat und diese aufrufen
             instance = self._registry[key]
             if hasattr(instance, 'close') and callable(getattr(instance, 'close')):
                 try:
-                    logging.debug(f"Calling close() method for instance with key '{key}'.")
+                    logger.debug(f"Calling close() method for instance with key '{key}'.")
                     instance.close()
                 except Exception as e:
-                    logging.warning(f"Error calling close() for instance '{key}': {e}", exc_info=True)
+                    logger.warning(f"Error calling close() for instance '{key}': {e}", exc_info=True)
             del self._registry[key]
         else:
-             logging.debug(f"Key '{key}' not found in registry for clearing.")
+             logger.debug(f"Key '{key}' not found in registry for clearing.")
 
     def clear_all(self):
         """Leert die gesamte Registry und ruft ggf. close() auf."""
-        logging.warning("Clearing all instances from GlobalRegistry.")
+        logger.warning("Clearing all instances from GlobalRegistry.")
         keys_to_clear = list(self._registry.keys()) # Kopie der Schlüssel, da wir das Dict ändern
         for key in keys_to_clear:
             self.clear_key(key)
-        logging.info("GlobalRegistry cleared.")
+        logger.info("GlobalRegistry cleared.")
 
 g_data = GlobalRegistry()

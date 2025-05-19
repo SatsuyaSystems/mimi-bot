@@ -8,13 +8,16 @@ import logging
 import os
 from lib.global_registry import g_data
 
+# Use a logger specific to this module
+logger = logging.getLogger(__name__)
+
 async def mimi_callback(callback_object):
     """
     Callback function for Mimi connector.
     This function is called when the Mimi connector is triggered.
     It processes the data and sends the result in chunks if necessary.
     """
-    logging.info("Mimi callback triggered.")
+    logger.info("Mimi callback triggered.")
     messageId = callback_object['messageid']
     channelId = callback_object['channel']
     content = callback_object['responce']
@@ -60,18 +63,18 @@ async def mimi_callback(callback_object):
     # Check if there is an image to upload
     if image_path:
         if os.path.exists(image_path):
-            logging.info(f"Uploading image: {image_path} to channel {channelId}")
+            logger.info(f"Uploading image: {image_path} to channel {channelId}")
             try:
                 await src_channel.send(file=discord.File(image_path))
-                logging.info("Image uploaded successfully.")
+                logger.info("Image uploaded successfully.")
                 os.remove(image_path)  # Remove the image after sending
-                logging.info(f"Image {image_path} removed after upload.")
+                logger.info(f"Image {image_path} removed after upload.")
             except Exception as e:
-                logging.error(f"Failed to upload image: {e}")
+                logger.error(f"Failed to upload image: {e}")
         else:
-            logging.warning(f"Image path does not exist: {image_path}")
+            logger.warning(f"Image path does not exist: {image_path}")
 
-    logging.info("Mimi callback processing completed.")
+    logger.info("Mimi callback processing completed.")
 
 async def search_callback(callback_object):
     """

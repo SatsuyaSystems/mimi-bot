@@ -7,6 +7,9 @@ import os
 context = None
 page = None
 
+# Use a logger specific to this module
+logger = logging.getLogger(__name__)
+
 async def initialize_browser():
     """Initialize and maintain browser connection"""
     global context, page
@@ -34,7 +37,7 @@ async def initialize_browser():
             await page.locator(locator).click()
             break
         except Exception as e:
-            logging.info(f"Browser initialization error: {e}")
+            logger.info(f"Browser initialization error: {e}")
             await asyncio.sleep(5)
 
 async def send_to_website(content: str):
@@ -53,19 +56,19 @@ async def wait_for_response():
     try:
         await page.locator(mic_selector).wait_for(state="visible", timeout=500000)
     except Exception as e:
-        logging.error(f"Timeout or error waiting for mic button: {e}")
+        logger.error(f"Timeout or error waiting for mic button: {e}")
         # Attempt to refresh or re-navigate if stuck
         try:
-            logging.info("Attempting to refresh page due to mic button timeout...")
+            logger.info("Attempting to refresh page due to mic button timeout...")
             await page.reload(wait_until="domcontentloaded")
             await page.locator(mic_selector).wait_for(state="visible", timeout=60000) # Shorter timeout after refresh
         except Exception as refresh_e:
-            logging.error(f"Failed to find mic button even after refresh: {refresh_e}")
+            logger.error(f"Failed to find mic button even after refresh: {refresh_e}")
             return "Error: Could not find the response indicator.", None
 
     response_blocks = page.locator(response_selector)
     response_count = await response_blocks.count()
-    logging.info(f"Found {response_count} response blocks.")
+    logger.info(f"Found {response_count} response blocks.")
     image_path = None
     latest_response_text = None
 
@@ -83,16 +86,16 @@ async def wait_for_response():
                 temp_image_path = os.path.join("temp", "latest_image_screenshot.png")
                 await image_element_locator.screenshot(path=temp_image_path)
                 image_path = temp_image_path
-                logging.info(f"Screenshot of image element saved to {image_path}")
+                logger.info(f"Screenshot of image element saved to {image_path}")
             else:
-                logging.info("No visible image element found in the latest response block for screenshot.")
+                logger.info("No visible image element found in the latest response block for screenshot.")
         except Exception as e:
             # This can happen if the locator doesn't find an image or times out
-            logging.info(f"Could not find or screenshot image element: {e}")
+            logger.info(f"Could not find or screenshot image element: {e}")
             image_path = None # Ensure image_path is None if screenshot fails
             
     else:
-        logging.warning("No response blocks found.")
+        logger.warning("No response blocks found.")
         latest_response_text = "No response content found."
 
     return latest_response_text, image_path
