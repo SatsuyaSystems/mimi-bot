@@ -2,6 +2,7 @@ from lib.global_registry import g_data
 from config.configurationFile import ConfigurationFile
 import logging, os, time
 from colorama import Fore, init
+from dc.rpc import start_rpc
 
 # --- Moved Logging Configuration ---
 os.makedirs('./logs', exist_ok=True) # Use makedirs and exist_ok=True
@@ -42,6 +43,8 @@ from core.automation import initialize_browser
 from core.handlers import process_message_from_queue
 
 async def main():
+    # Discord rich presence
+    asyncio.create_task(start_rpc())
     # Initialize Playwright browser
     await initialize_browser()
     logging.info("Browser initialized.")
