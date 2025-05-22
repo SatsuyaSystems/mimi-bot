@@ -48,32 +48,47 @@ start.bat or start.sh on linux
 
 ```
 mimi-bot/
-├── config/            # Configuration files
+├── config/               # Configuration files
 │   ├── __init__.py
-│   ├── config.yml     # Main configuration
-│   └── configurationFile.py
-├── core/              # Core functionality
+│   ├── config.yml        # Main configuration
+│   ├── configurationFile.py
+│   └── example_config.yml # Example configuration
+├── core/                 # Core functionality
 │   ├── __init__.py
-│   ├── automation.py  # Task automation handlers
-│   ├── callback.py    # Event callback system
-│   ├── handlers.py    # Message processing logic
-│   └── utils.py       # Utility functions
-├── dc/                # Discord integration
+│   ├── automation.py     # Task automation handlers
+│   ├── callback.py       # Event callback system
+│   ├── handlers.py       # Message processing logic
+│   └── utils.py          # Utility functions
+├── dc/                   # Discord integration
 │   ├── __init__.py
-│   └── bot.py         # Discord client implementation
-├── lib/               # Shared utilities
+│   ├── bot.py            # Discord client implementation
+│   └── rpc.py            # Rich Presence code
+├── lib/                  # Shared utilities
 │   ├── __init__.py
-│   └── global_registry.py  # Service registry
-├── logs/              # Application logs
-├── user_data/         # User-specific storage
-├── validation/        # Security configurations
+│   └── global_registry.py # Service registry
+├── logs/                 # Application logs
+├── temp/                 # Temporary files
+├── user_data/            # User-specific storage
+├── validation/           # Security configurations / Validation files
 │   ├── communication.txt
+│   ├── persona.txt       # Persona configuration
 │   └── uservalidation.txt
-├── main.py            # Entry point
-├── requirements.txt   # Dependencies
-├── setup.bat          # Setup script
-├── start.bat          # Launch script
-└── update.bat          # Executes git pull -v
+├── venv/                 # Virtual Python environment (typical)
+├── .gitignore            # Files/folders ignored by Git
+├── dev.bat               # Development batch script
+├── full_install_linux.sh # Full installation script for Linux
+├── full_install_win.bat  # Full installation script for Windows
+├── LICENSE               # License file
+├── main.py               # Program entry point
+├── README.md             # Project description
+├── requirements.txt      # Dependencies
+├── setup.bat             # Setup script
+├── setup.sh              # Setup script for Linux/macOS
+├── start.bat             # Launch script
+├── start.sh              # Launch script for Linux/macOS
+├── unnamed.png           # Image file in main directory
+├── update.bat            # Executes 'git pull -v'
+└── update.sh             # Update script for Linux/macOS
 ```
 
 ## Configuration
