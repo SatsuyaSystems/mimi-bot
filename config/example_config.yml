@@ -4,3 +4,6 @@ discord:
     - "12345678910"
   target_channel: # Channel where the bots listens
     - "13709483913" # Public channel
+
+bot:
+  log_level: "INFO" # Logging level (e.g., DEBUG, INFO, WARNING, ERROR)
