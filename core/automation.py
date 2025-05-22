@@ -52,7 +52,7 @@ async def wait_for_response():
     """Wait for and return website response"""
     response_selector = '//message-content'
     mic_selector = 'xpath=//*[@id="app-root"]/main/side-navigation-v2/bard-sidenav-container/bard-sidenav-content/div[2]/div/div[2]/chat-window/div/input-container/div/input-area-v2/div/div/div[3]/div/div[1]/speech-dictation-mic-button/button/div/mat-icon'
-
+  
     try:
         await page.locator(mic_selector).wait_for(state="visible", timeout=500000)
     except Exception as e:
@@ -79,6 +79,7 @@ async def wait_for_response():
         # Check if the latest response contains an image and take a screenshot of it
         # Using a more specific selector for images within the response block
         image_element_locator = latest_response_block.locator('img').first # Get the first img if multiple
+        code_element_locator = latest_response_block.locator('code-block').first # Get the first code block if multiple
         
         try:
             if await image_element_locator.is_visible(timeout=5000): # Check if image is visible
@@ -93,6 +94,19 @@ async def wait_for_response():
             # This can happen if the locator doesn't find an image or times out
             logger.info(f"Could not find or screenshot image element: {e}")
             image_path = None # Ensure image_path is None if screenshot fails
+
+        try:
+            if await code_element_locator.is_visible(timeout=5000): # Check if code block is visible
+                code_text = await code_element_locator.inner_text()
+                if code_text.strip():
+                    formatted_code = f"```{code_text.strip()}\n```"  # Format the code block
+                    latest_response_text = latest_response_text.replace(code_text, formatted_code)
+                    logger.info("Code block found and formatted in the response text.")
+            else:
+                logger.info("No visible code block found in the latest response block")
+        except Exception as e:
+            # This can happen if the locator doesn't find a code block or times out
+            logger.info(f"Could not find code block: {e}")
             
     else:
         logger.warning("No response blocks found.")

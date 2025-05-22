@@ -24,7 +24,7 @@ async def mimi_callback(callback_object):
     image_path = callback_object.get('image')  # Get the image path if it exists
 
     # replace for codeblocks
-    content = content.replace(";;;", "```")  # Add a newline after code blocks
+    #content = content.replace(";;;", "```")  # Add a newline after code blocks
 
     # Get the bot instance and channel/message references
     bot = g_data.get("discord_bot")
