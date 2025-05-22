@@ -144,6 +144,7 @@ Scripts are provided to easily update the bot to the latest version from the Git
 These scripts typically run `git pull -v`.
 
 ## Project Structure
+```
 mimi-bot/
 ├── config/               # Configuration files
 │   ├── init.py
@@ -186,7 +187,7 @@ mimi-bot/
 ├── unnamed.png           # Image file (likely for persona visual)
 ├── update.bat            # Update script for Windows (git pull)
 └── update.sh             # Update script for Linux/macOS (git pull)
-
+```
 
 ## Troubleshooting & Notes
 
