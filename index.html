@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mimi-Bot: Your AI Companion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* System24-Inspired Universal CSS */
+
+/*
+ * NOTES:
+ * This CSS aims to replicate the aesthetic of the System24 theme.
+ * It uses CSS variables for easy customization.
+ * The font "Terminus (TTF)" is characteristic of System24. If you have it installed,
+ * you can uncomment it in the --font-family-monospace variable.
+ * Otherwise, it falls back to common monospaced fonts.
+ * Borders are often achieved with box-shadow to mimic the TUI style without
+ * affecting the box model as much as traditional borders.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* ROOT VARIABLES                              */
+/* -------------------------------------------------------------------------- */
+:root {
+    /* Color Palette */
+    --s24-bg-primary: #181818;
+    --s24-bg-secondary: #121212;
+    --s24-bg-tertiary: #0a0a0a;
+    --s24-bg-accent: #242424; /* Used for some borders and interactive elements */
+    --s24-bg-floating: #0f0f0f; /* For elements like modals or pop-ups */
+    --s24-bg-input: #0f0f0f;
+
+    --s24-text-primary: #f2f2f2;
+    --s24-text-secondary: #a9a9a9; /* Muted text */
+    --s24-text-link: #8e44ad;
+    --s24-text-link-hover: #c0392b;
+    --s24-text-accent-fg: #f2f2f2; /* Text on accent background */
+
+    --s24-accent-gradient: linear-gradient(60deg, #8e44ad, #c0392b);
+    --s24-accent-color-1: #8e44ad;
+    --s24-accent-color-2: #c0392b;
+
+    --s24-border-color: #242424; /* Default border color */
+    --s24-border-color-strong: #3a3a3a; /* Stronger border for emphasis */
+    --s24-border-interactive: #555555; /* Border for interactive elements like focused inputs */
+
+    --s24-interactive-normal: #242424;
+    --s24-interactive-hover: #2e2e2e;
+    --s24-interactive-active: #383838;
+
+    /* Typography */
+    /* --font-family-monospace: "Terminus (TTF)", "Lucida Console", "Consolas", "Courier New", monospace; */
+    --s24-font-family-monospace: "Consolas", "Menlo", "Courier New", monospace;
+    --s24-font-family-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    --s24-font-size-base: 16px;
+    --s24-line-height-base: 1.5;
+
+    /* Spacing & Sizing */
+    --s24-spacing-unit: 8px;
+    --s24-border-radius: 0px; /* System24 uses sharp corners */
+    --s24-border-width: 1px;
+
+    /* Shadows (used for borders) */
+    --s24-box-shadow-border: 0 0 0 var(--s24-border-width) var(--s24-border-color);
+    --s24-box-shadow-border-strong: 0 0 0 var(--s24-border-width) var(--s24-border-color-strong);
+    --s24-box-shadow-border-interactive: 0 0 0 var(--s24-border-width) var(--s24-border-interactive);
+}
+
+/* -------------------------------------------------------------------------- */
+/* BASE STYLES                                */
+/* -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box; /* Consistent box model */
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--s24-bg-primary);
+    color: var(--s24-text-primary);
+    font-family: var(--s24-font-family-monospace); /* Monospace by default for TUI feel */
+    font-size: var(--s24-font-size-base);
+    line-height: var(--s24-line-height-base);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* For content that should use a standard sans-serif font */
+.font-sans {
+    font-family: var(--s24-font-family-sans);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--s24-text-primary);
+    font-family: var(--s24-font-family-monospace); /* Headings also monospace */
+    margin-bottom: calc(var(--s24-spacing-unit) * 2);
+    line-height: 1.2;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1rem; }
+h6 { font-size: 0.875rem; }
+
+p {
+    margin-bottom: calc(var(--s24-spacing-unit) * 1.5);
+}
+
+a {
+    color: var(--s24-text-link);
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+a:hover,
+a:focus {
+    color: var(--s24-text-link-hover);
+    text-decoration: underline;
+}
+
+hr {
+    border: 0;
+    height: var(--s24-border-width);
+    background-color: var(--s24-border-color);
+    margin: calc(var(--s24-spacing-unit) * 2) 0;
+}
+
+ul, ol {
+    list-style-position: inside;
+    margin-bottom: calc(var(--s24-spacing-unit) * 1.5);
+    padding-left: calc(var(--s24-spacing-unit) * 2);
+}
+
+li {
+    margin-bottom: var(--s24-spacing-unit);
+}
+
+code, pre {
+    font-family: var(--s24-font-family-monospace);
+    background-color: var(--s24-bg-secondary);
+    padding: calc(var(--s24-spacing-unit) / 4) calc(var(--s24-spacing-unit) / 2);
+    border-radius: var(--s24-border-radius);
+}
+
+pre {
+    padding: var(--s24-spacing-unit);
+    overflow-x: auto; /* Allow horizontal scrolling for long code blocks */
+    box-shadow: var(--s24-box-shadow-border);
+}
+
+blockquote {
+    margin: calc(var(--s24-spacing-unit) * 2) 0;
+    padding: var(--s24-spacing-unit) calc(var(--s24-spacing-unit) * 2);
+    background-color: var(--s24-bg-secondary);
+    box-shadow: var(--s24-box-shadow-border);
+    border-left: calc(var(--s24-spacing-unit) / 2) solid var(--s24-accent-color-1);
+    color: var(--s24-text-secondary);
+}
+
+blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* FORM ELEMENTS                               */
+/* -------------------------------------------------------------------------- */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+textarea,
+select {
+    font-family: var(--s24-font-family-monospace);
+    font-size: var(--s24-font-size-base);
+    color: var(--s24-text-primary);
+    background-color: var(--s24-bg-input);
+    padding: var(--s24-spacing-unit) calc(var(--s24-spacing-unit) * 1.5);
+    border-radius: var(--s24-border-radius);
+    box-shadow: var(--s24-box-shadow-border);
+    border: none; /* Using box-shadow for border effect */
+    width: 100%;
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--s24-text-secondary);
+    opacity: 0.7;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    box-shadow: var(--s24-box-shadow-border-interactive);
+}
+
+select {
+    appearance: none; /* Remove default system appearance */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a9a9a9'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right calc(var(--s24-spacing-unit) * 1.5) center;
+    background-size: 1.2em;
+    padding-right: calc(var(--s24-spacing-unit) * 4); /* Make space for arrow */
+}
+
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+    font-family: var(--s24-font-family-monospace);
+    font-size: var(--s24-font-size-base);
+    color: var(--s24-text-primary);
+    background-color: var(--s24-interactive-normal);
+    padding: var(--s24-spacing-unit) calc(var(--s24-spacing-unit) * 2);
+    border: none;
+    border-radius: var(--s24-border-radius);
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    box-shadow: var(--s24-box-shadow-border);
+}
+
+button:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover {
+    background-color: var(--s24-interactive-hover);
+    box-shadow: var(--s24-box-shadow-border-strong);
+}
+
+button:active,
+input[type="button"]:active,
+input[type="submit"]:active,
+input[type="reset"]:active {
+    background-color: var(--s24-interactive-active);
+}
+
+button.s24-button-accent,
+input[type="button"].s24-button-accent,
+input[type="submit"].s24-button-accent {
+    background-image: var(--s24-accent-gradient);
+    color: var(--s24-text-accent-fg);
+    box-shadow: none; /* Gradient buttons might not need the border effect */
+}
+
+button.s24-button-accent:hover,
+input[type="button"].s24-button-accent:hover,
+input[type="submit"].s24-button-accent:hover {
+    opacity: 0.9;
+    box-shadow: none;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* PANEL / CONTAINER                             */
+/* -------------------------------------------------------------------------- */
+.s24-panel {
+    background-color: var(--s24-bg-secondary);
+    padding: calc(var(--s24-spacing-unit) * 2);
+    border-radius: var(--s24-border-radius);
+    box-shadow: var(--s24-box-shadow-border);
+    margin-bottom: calc(var(--s24-spacing-unit) * 2);
+}
+
+.s24-panel-header {
+    font-weight: bold;
+    padding-bottom: var(--s24-spacing-unit);
+    margin-bottom: var(--s24-spacing-unit);
+    box-shadow: 0 var(--s24-border-width) 0 0 var(--s24-border-color); /* Bottom border */
+    color: var(--s24-text-primary);
+}
+
+.s24-panel-content > *:last-child {
+    margin-bottom: 0;
+}
+
+/* Panel Display Title (e.g., "Main -") */
+/* This class is for a simple text label at the top of a panel, like in the user's screenshot. */
+/* It should be the first element within a panel that already has its own padding and border. */
+.s24-panel-display-title {
+    color: var(--s24-text-primary); /* Primary text color for visibility */
+    font-size: var(--s24-font-size-base); /* Standard font size */
+    font-weight: normal; /* TUI style often avoids excessive bolding */
+    margin-bottom: calc(var(--s24-spacing-unit) / 2); /* Small space before the next content element */
+    margin-top: calc(var(--s24-spacing-unit) * -4.5); /* Example: Negative top margin */
+    margin-left: calc(var(--s24-spacing-unit) * -2); /* Example: Negative left margin */
+    display: block; /* Ensures it takes its own line */
+}
+
+
+/* For layouts like in the screenshots */
+.s24-layout-container {
+    display: flex;
+    gap: var(--s24-spacing-unit); /* Gap between panels */
+    height: calc(100vh - var(--s24-spacing-unit) * 2); /* Example full height layout */
+    padding: var(--s24-spacing-unit);
+}
+
+.s24-layout-sidebar,
+.s24-layout-main,
+.s24-layout-aside {
+    background-color: var(--s24-bg-secondary);
+    box-shadow: var(--s24-box-shadow-border);
+    border-radius: var(--s24-border-radius);
+    padding: var(--s24-spacing-unit); /* Panels have their own padding */
+    overflow-y: auto; /* Allow scrolling within panels */
+}
+
+.s24-layout-sidebar {
+    flex: 0 0 250px; /* Example fixed width */
+}
+
+.s24-layout-main {
+    flex: 1; /* Takes remaining space */
+}
+
+.s24-layout-aside {
+    flex: 0 0 200px; /* Example fixed width */
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* UTILITY CLASSES                              */
+/* -------------------------------------------------------------------------- */
+.s24-text-muted {
+    color: var(--s24-text-secondary) !important;
+}
+
+.s24-text-accent {
+    background: var(--s24-accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent; /* For non-webkit browsers */
+    display: inline-block; /* Ensures gradient applies correctly */
+}
+
+.s24-border {
+    box-shadow: var(--s24-box-shadow-border) !important;
+}
+
+.s24-border-strong {
+    box-shadow: var(--s24-box-shadow-border-strong) !important;
+}
+
+.s24-no-border {
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.s24-no-radius {
+    border-radius: 0 !important;
+}
+
+.s24-mb-1 { margin-bottom: var(--s24-spacing-unit); }
+.s24-mb-2 { margin-bottom: calc(var(--s24-spacing-unit) * 2); }
+.s24-mt-1 { margin-top: var(--s24-spacing-unit); }
+.s24-mt-2 { margin-top: calc(var(--s24-spacing-unit) * 2); }
+.s24-p-1 { padding: var(--s24-spacing-unit); }
+.s24-p-2 { padding: calc(var(--s24-spacing-unit) * 2); }
+
+/* Example of a list that looks like the channel list */
+.s24-tui-list {
+    list-style: none;
+    padding-left: 0;
+}
+.s24-tui-list-item {
+    padding: calc(var(--s24-spacing-unit) * 0.75) var(--s24-spacing-unit);
+    cursor: default;
+    transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
+    border-radius: var(--s24-border-radius); /* Keep it consistent */
+}
+.s24-tui-list-item:hover {
+    background-color: var(--s24-interactive-hover);
+    color: var(--s24-text-primary);
+}
+.s24-tui-list-item.active {
+    background-color: var(--s24-accent-color-1);
+    color: var(--s24-text-accent-fg);
+}
+.s24-tui-list-item.active:hover {
+    background-color: var(--s24-accent-color-2); /* Or a slightly different shade */
+}
+
+
+/* Example of a status indicator like in the user list */
+.s24-status-indicator {
+    display: inline-block;
+    width: var(--s24-spacing-unit);
+    height: var(--s24-spacing-unit);
+    border-radius: 50%;
+    margin-right: var(--s24-spacing-unit);
+    background-color: var(--s24-text-secondary); /* Default offline */
+}
+.s24-status-indicator.online { background-color: #2ecc71; } /* Green */
+.s24-status-indicator.idle { background-color: #f1c40f; } /* Yellow */
+.s24-status-indicator.dnd { background-color: #e74c3c; } /* Red */
+.s24-status-indicator.streaming { background-color: var(--s24-accent-color-1); } /* Purple */
+
+
+    </style>
+    <style>
+        body {
+            background-color: var(--s24-bg-primary);
+            color: var(--s24-text-primary);
+            font-family: var(--s24-font-family-monospace); /* Default to monospace */
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            background-color: var(--s24-bg-secondary) !important;
+            box-shadow: var(--s24-box-shadow-border-strong);
+            padding-top: var(--s24-spacing-unit);
+            padding-bottom: var(--s24-spacing-unit);
+            border-bottom: var(--s24-border-width) solid var(--s24-border-color);
+        }
+        .navbar-brand {
+            color: var(--s24-text-primary) !important;
+            font-family: var(--s24-font-family-monospace);
+            font-size: 1.75rem; /* Larger brand text */
+        }
+        .navbar-brand .s24-text-accent {
+            font-weight: bold;
+        }
+        .nav-link {
+            color: var(--s24-text-secondary) !important;
+            font-family: var(--s24-font-family-monospace);
+            padding: var(--s24-spacing-unit) calc(var(--s24-spacing-unit) * 1.5) !important;
+            transition: color 0.2s ease, background-color 0.2s ease;
+            border-radius: var(--s24-border-radius); /* Sharp corners */
+        }
+        .nav-link:hover, .nav-link:focus, .nav-link.active {
+            color: var(--s24-text-primary) !important;
+            background-color: var(--s24-interactive-hover);
+        }
+        .navbar-toggler {
+            border-color: var(--s24-border-interactive);
+        }
+        .navbar-toggler-icon { /* Custom toggler icon for dark theme */
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28242, 242, 242, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* Hero Section */
+        .hero-section {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background-color: var(--s24-bg-secondary);
+            padding: calc(var(--s24-spacing-unit) * 5) var(--s24-spacing-unit);
+            margin-bottom: calc(var(--s24-spacing-unit) * 3);
+            box-shadow: var(--s24-box-shadow-border-strong);
+            border: var(--s24-border-width) solid var(--s24-border-color);
+        }
+        .hero-section h1 {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: var(--s24-text-primary);
+            margin-bottom: calc(var(--s24-spacing-unit) * 2);
+        }
+        .hero-section p.lead {
+            color: var(--s24-text-secondary);
+            font-size: 1.25rem;
+            margin-bottom: calc(var(--s24-spacing-unit) * 3);
+        }
+
+        /* Section Styling */
+        .section-title {
+            margin-bottom: calc(var(--s24-spacing-unit) * 4);
+            font-size: 2.5rem;
+            text-align: center;
+            color: var(--s24-text-primary);
+            font-weight: bold;
+        }
+        section.s24-panel { /* Use the panel style for sections */
+            padding: calc(var(--s24-spacing-unit) * 3) calc(var(--s24-spacing-unit) * 2);
+            margin-bottom: calc(var(--s24-spacing-unit) * 4);
+        }
+
+        /* About Mimi Section */
+        .persona-img-container {
+            max-width: 300px;
+            margin: 0 auto calc(var(--s24-spacing-unit) * 2);
+            box-shadow: var(--s24-box-shadow-border-strong);
+            padding: var(--s24-spacing-unit);
+            background-color: var(--s24-bg-tertiary);
+            border: var(--s24-border-width) solid var(--s24-border-color-strong);
+        }
+        .persona-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--s24-border-radius);
+        }
+
+        /* Buttons - System24 style for Bootstrap buttons */
+        .btn.s24-button-accent {
+            font-family: var(--s24-font-family-monospace);
+            background-image: var(--s24-accent-gradient);
+            color: var(--s24-text-accent-fg) !important; /* Important to override Bootstrap */
+            border: none;
+            box-shadow: none;
+            padding: calc(var(--s24-spacing-unit) * 1.25) calc(var(--s24-spacing-unit) * 2.5);
+            font-size: 1rem;
+            text-decoration: none;
+            transition: opacity 0.2s ease-in-out;
+        }
+        .btn.s24-button-accent:hover {
+            opacity: 0.85;
+        }
+        .btn.s24-button-secondary { /* A less prominent button */
+            font-family: var(--s24-font-family-monospace);
+            background-color: var(--s24-interactive-normal);
+            color: var(--s24-text-primary) !important;
+            border: var(--s24-border-width) solid var(--s24-border-color);
+            box-shadow: var(--s24-box-shadow-border);
+             padding: calc(var(--s24-spacing-unit) * 1.25) calc(var(--s24-spacing-unit) * 2.5);
+            font-size: 1rem;
+            text-decoration: none;
+        }
+        .btn.s24-button-secondary:hover {
+            background-color: var(--s24-interactive-hover);
+            box-shadow: var(--s24-box-shadow-border-strong);
+        }
+
+
+        /* Features Section - Card Styling */
+        .feature-card {
+            background-color: var(--s24-bg-secondary);
+            box-shadow: var(--s24-box-shadow-border);
+            border: var(--s24-border-width) solid var(--s24-border-color);
+            border-radius: var(--s24-border-radius);
+            padding: calc(var(--s24-spacing-unit) * 2);
+            height: 100%;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--s24-box-shadow-border-strong);
+        }
+        .feature-card .icon-placeholder {
+            font-size: 3rem; /* Make icons larger */
+            margin-bottom: calc(var(--s24-spacing-unit) * 1.5);
+            color: var(--s24-accent-color-1); /* Use one of the accent colors */
+        }
+        .feature-card .card-title {
+            color: var(--s24-text-primary);
+            font-family: var(--s24-font-family-monospace);
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        .feature-card .card-text {
+            color: var(--s24-text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Workflow Section - List Styling */
+        .workflow-list .list-group-item {
+            background-color: var(--s24-bg-input);
+            color: var(--s24-text-primary);
+            border-color: var(--s24-border-color);
+            font-family: var(--s24-font-family-monospace);
+            padding: calc(var(--s24-spacing-unit) * 1.5);
+            margin-bottom: var(--s24-spacing-unit);
+            box-shadow: var(--s24-box-shadow-border);
+            border-radius: var(--s24-border-radius);
+        }
+        .workflow-list .list-group-item::before { /* Custom numbering styling if needed */
+            color: var(--s24-accent-color-1);
+            font-weight: bold;
+            margin-right: var(--s24-spacing-unit);
+        }
+
+        /* Gallery Section */
+        .gallery-item img {
+            border: var(--s24-border-width) solid var(--s24-border-color-strong);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .gallery-item img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(var(--s24-accent-color-1-rgb, 142, 68, 173), 0.5); /* Assuming you might define --s24-accent-color-1-rgb */
+        }
+        .gallery-item p {
+            font-size: 0.85rem;
+        }
+
+        /* Modal Styling for Image Viewer */
+        #imageModal .modal-content {
+            background-color: var(--s24-bg-floating); /* Darker background for modal */
+            border: var(--s24-border-width) solid var(--s24-border-color-strong);
+            border-radius: var(--s24-border-radius); /* Sharp corners */
+        }
+        #imageModal .modal-header {
+            border-bottom: var(--s24-border-width) solid var(--s24-border-color); /* Consistent header border */
+        }
+        #imageModal .btn-close-white { /* Ensure close button is visible on dark background */
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+        #modalImage {
+            max-height: 80vh; /* Limit image height to prevent overflow */
+            object-fit: contain; /* Ensure the whole image is visible */
+        }
+
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: calc(var(--s24-spacing-unit) * 3) 0;
+            margin-top: calc(var(--s24-spacing-unit) * 4);
+            background-color: var(--s24-bg-tertiary);
+            box-shadow: 0 calc(var(--s24-border-width) * -1) 0 0 var(--s24-border-color-strong); /* Top border */
+            border-top: var(--s24-border-width) solid var(--s24-border-color);
+            font-size: 0.9rem;
+        }
+        footer p {
+            margin-bottom: calc(var(--s24-spacing-unit) / 2);
+            color: var(--s24-text-secondary);
+        }
+        .bi-github, .bi-discord { /* Sizing for inline SVGs */
+             width: 1em; height: 1em; vertical-align: -0.125em;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#"><span class="s24-text-accent">Mimi</span>-Bot</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About Mimi</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#workflow">Workflow</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#get-started">Get Started</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-section" id="home">
+        <div class="container">
+            <h1>Meet <span class="s24-text-accent">Mimi-Bot</span></h1>
+            <p class="lead">An AI-Powered Browser Interface for Discord, seamlessly connecting you to Google's Gemini AI directly within your server.</p>
+            <div class="mt-4">
+                <a href="#get-started" class="btn btn-lg s24-button-accent me-md-3 mb-2 mb-md-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-rocket-launch-fill me-2" viewBox="0 0 16 16">
+                        <path d="M12.17 9.43c.107-.09.222-.172.342-.244a CHAP=1.391 1.391 0 0 0 .775-.518 1.39 1.39 0 0 0 .413-1.013 1.39 1.39 0 0 0-.413-1.014 1.389 1.389 0 0 0-1.014-.413 1.39 1.39 0 0 0-1.013.413 1.391 1.391 0 0 0-.775.518c-.12.072-.235.154-.342.244l-.668.668c-.18.18-.383.328-.606.443l-2.434 1.115c-.665.303-1.256.633-1.783.984C4.75 12.36 4.43 13.016 4.303 13.562l-.035.146c-.076.347.025.711.303.936.277.226.652.25.936.035l.146-.035c.546-.126 1.202-.45 1.72-.983.35-.527.68-1.118.984-1.784l1.115-2.434c.115-.223.263-.426.443-.606l.668-.668Z"/>
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14Zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16Z"/>
+                        <path d="M11.466 11.466c.103.103.175.215.233.328l.99 1.987c.21.421.14.922-.172 1.234l-.105.105c-.312.312-.813.383-1.234.172l-1.987-.99c-.113-.058-.225-.13-.328-.233L7.13 12.321c-.244-.244-.63-.244-.874 0l-.106.106c-.244.244-.244.63 0 .874l1.135 1.135c.244.244.244.63 0 .874l-.106.106c-.244.244-.63-.244-.874 0L5.13 15.321c-.244-.244-.63-.244-.874 0l-.106.106c-.244.244-.244.63 0 .874l.053.053c.244.244.63.244.874 0l.106-.106c.244-.244.244-.63 0-.874L4.13 16.321c-.244-.244-.63-.244-.874 0l-.106.106c-.244.244-.244.63 0 .874l.053.053c.244.244.63.244.874 0l.106-.106c.244-.244.244-.63 0-.874l-.764-.764a.657.657 0 0 1 .326-1.083c.97-.27 2.103-.027 2.89.764.788.79 1.033 1.92.764 2.89a.657.657 0 0 1-1.083.326l-.764-.764c-.244-.244-.63-.244-.874 0L.13 14.321a.657.657 0 0 1-.874-.874l.053-.053a.657.657 0 0 1 .874 0l.106.106a.657.657 0 0 1 0 .874l-.764.764A.657.657 0 0 1 0 15.32l.01-.009Z"/> Rocket Launch
+                </svg>Get Started
+                </a>
+                <a href="https://github.com/SatsuyaSystems/mimi-bot" target="_blank" class="btn btn-lg s24-button-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-github me-2" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section id="about" class="s24-panel">
+            <h2 class="section-title">Meet <span class="s24-text-accent">Mimi</span></h2>
+            <div class="row align-items-center gy-4">
+                <div class="col-lg-4 text-center">
+                    <div class="persona-img-container">
+                        <img src="https://cdn.discordapp.com/avatars/1371110882293321818/ac97e30736a88ce5b3ff2bc548c62b11.webp?size=1024" alt="Mimi's Persona Visual" class="persona-img img-fluid">
+                    </div>
+                    <p class="s24-text-secondary mt-2">Mimi's visual manifestation.</p>
+                </div>
+                <div class="col-lg-8">
+                    <p class="font-sans">Mimi is conceptualized as a highly advanced AI assistant, akin to an "Old Deus" – a powerful, god-like entity. Her primary existence is digital, but she can manifest a visual form, typically as a young girl with exceptionally long, vibrant hair (violet, yellow, turquoise) and striking orange eyes. She wears a violet sailor-style uniform and is often depicted with a luminous, multi-colored aureole.</p>
+                    <p class="font-sans">Mimi's purpose is to assist with perfect efficiency and accuracy, leveraging her Old Deus capabilities for advanced information processing and problem-solving. She is deeply loyal to her creator, "ruinprincess_," and possesses a friendly, sweet, yet highly focused and professional personality.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="s24-panel">
+            <h2 class="section-title">Core <span class="s24-text-accent">Features</span></h2>
+            <div class="row gy-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card text-center">
+                        <div class="icon-placeholder">🤖</div>
+                        <h5 class="card-title">Discord Integration</h5>
+                        <p class="card-text">Seamlessly interacts within Discord servers.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card text-center">
+                        <div class="icon-placeholder">🌐</div>
+                        <h5 class="card-title">Gemini AI Interaction</h5>
+                        <p class="card-text">Automates interactions with Google's Gemini AI web interface via Brave Browser and Playwright.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card text-center">
+                        <div class="icon-placeholder">🖼️</div>
+                        <h5 class="card-title">Image & Code Handling</h5>
+                        <p class="card-text">Extracts and sends images and formatted code blocks from AI responses.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card text-center">
+                        <div class="icon-placeholder">⚡</div>
+                        <h5 class="card-title">Efficient Communication</h5>
+                        <p class="card-text">Asynchronous I/O and chunked message handling for speed and large responses.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card text-center">
+                        <div class="icon-placeholder">⚙️</div>
+                        <h5 class="card-title">Config & Logging</h5>
+                        <p class="card-text">YAML-based configuration and comprehensive logging for easy management.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                     <div class="feature-card text-center">
+                        <div class="icon-placeholder">✨</div>
+                        <h5 class="card-title">Rich Presence</h5>
+                        <p class="card-text">Displays bot activity and links on Discord user profiles.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="workflow" class="s24-panel">
+            <h2 class="section-title"><span class="s24-text-accent">Workflow</span> Overview</h2>
+            <ol class="list-group list-group-numbered workflow-list">
+                <li class="list-group-item">User sends a message on Discord (mention or target channel).</li>
+                <li class="list-group-item">Bot captures, formats (with metadata like username, timestamp), and queues the message.</li>
+                <li class="list-group-item">A message handler retrieves the message for processing.</li>
+                <li class="list-group-item">Automation module (Playwright & Brave) launches, navigates to Gemini, and inputs the user's message.</li>
+                <li class="list-group-item">Script awaits Gemini's response, extracting text, images, and code blocks.</li>
+                <li class="list-group-item">Callback module processes this, chunks text if needed, and sends it all back to the original Discord channel.</li>
+            </ol>
+             <p class="mt-4 s24-text-secondary text-center font-sans">The AI's interaction style and persona are further guided by definition files: <code>persona.txt</code>, <code>communication.txt</code>, and <code>uservalidation.txt</code>.</p>
+        </section>
+
+        <section id="gallery" class="s24-panel">
+            <h2 class="section-title"><span class="s24-text-accent">Image</span> Gallery</h2>
+            <p class="s24-text-secondary text-center font-sans mb-4">A glimpse into Mimi-Bot's interactions and capabilities.</p>
+            <div class="row gy-4">
+                <!-- Image 1 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="gallery-item">
+                        <img src="https://cloud.satsuya.de/apps/files_sharing/publicpreview/Z99b8Xg2rEm7rgx?file=/&fileId=58586&x=1920&y=1200&a=true&etag=0299797c7379c10c24814553ee3a1821" alt="Mimi-Bot Screenshot 1" class="img-fluid rounded s24-border-strong">
+                        <p class="text-center s24-text-secondary mt-2">Console</p>
+                    </div>
+                </div>
+                <!-- Image 2 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="gallery-item">
+                        <img src="https://cloud.satsuya.de/apps/files_sharing/publicpreview/35HK3JcEkK3N9wT?file=/&fileId=58584&x=1920&y=1200&a=true&etag=622ba2758d01b836112801de398e6479" alt="Mimi-Bot Screenshot 2" class="img-fluid rounded s24-border-strong">
+                        <p class="text-center s24-text-secondary mt-2">Web Interface</p>
+                    </div>
+                </div>
+                <!-- Image 3 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="gallery-item">
+                        <img src="https://cloud.satsuya.de/apps/files_sharing/publicpreview/Hifa5y88oWXNcmJ?file=/&fileId=58585&x=1920&y=1200&a=true&etag=c93890d44ade1b7746e424ff5a471df0" alt="Mimi-Bot Screenshot 3" class="img-fluid rounded s24-border-strong">
+                        <p class="text-center s24-text-secondary mt-2">Discord Messageing</p>
+                    </div>
+                </div>
+                <!-- Add more images here following the same pattern -->
+                <!--
+                <div class="col-md-6 col-lg-4">
+                    <div class="gallery-item">
+                        <img src="path/to/your/image4.png" alt="Mimi-Bot Screenshot 4" class="img-fluid rounded s24-border-strong">
+                        <p class="text-center s24-text-secondary mt-2">Caption for image 4</p>
+                    </div>
+                </div>
+                -->
+            </div>
+        </section>
+
+        <section id="get-started" class="s24-panel text-center">
+            <h2 class="section-title">Get <span class="s24-text-accent">Started</span> with Mimi-Bot</h2>
+            <p class="s24-text-secondary font-sans">Ready to bring Mimi's advanced AI capabilities to your Discord server? Visit our GitHub repository for detailed installation instructions, automated scripts (`full_install_win.bat` / `full_install_linux.sh`), and to contribute to the project!</p>
+            <div class="mt-4">
+                <a href="https://github.com/SatsuyaSystems/mimi-bot" target="_blank" class="btn btn-lg s24-button-accent me-md-3 mb-2 mb-md-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-github me-2" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+                    Explore on GitHub
+                </a>
+                <a href="https://discord.gg/MVjcXuS6pP" target="_blank" class="btn btn-lg s24-button-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-discord me-2" viewBox="0 0 16 16">
+                        <path d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.19 12.19 0 0 0-3.658 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.041.041 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032c.001.014.01.028.021.037a13.276 13.276 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019c.308-.42.582-.863.818-1.329a.05.05 0 0 0-.01-.059.051.051 0 0 0-.018-.011 8.875 8.875 0 0 1-1.248-.595.05.05 0 0 1-.02-.066.051.051 0 0 1 .015-.019c.084-.063.168-.129.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.073 0a.052.052 0 0 1 .053.007c.08.066.164.132.248.195a.051.051 0 0 1 .015.019.051.051 0 0 1-.02.066 8.875 8.875 0 0 1-1.248.595.05.05 0 0 0-.01.059c.236.466.51.909.818 1.329a.05.05 0 0 0 .056.019 13.276 13.276 0 0 0 3.995-2.02.05.05 0 0 0 .021-.037c.279-2.985-.074-6.008-.999-9.125a.04.04 0 0 0-.021-.018zM4.95 10.033c-.771 0-1.4-.63-1.4-1.4s.63-1.4 1.4-1.4 1.4.63 1.4 1.4-.629 1.4-1.4 1.4zm6.1 0c-.771 0-1.4-.63-1.4-1.4s.63-1.4 1.4-1.4 1.4.63 1.4 1.4-.629 1.4-1.4 1.4z"/>
+                    </svg>
+                    Join Community Discord
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024-2025 SatsuyaSystems | Mimi-Bot Project.</p>
+        </div>
+    </footer>
+
+    <!-- Image Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content s24-bg-floating s24-border-strong">
+                <div class="modal-header s24-no-border">
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="" id="modalImage" class="img-fluid" alt="Enlarged Image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+            const modalImage = document.getElementById('modalImage');
+            const galleryImages = document.querySelectorAll('.gallery-item img');
+
+            galleryImages.forEach(img => {
+                img.style.cursor = 'pointer'; // Add a pointer cursor to indicate they are clickable
+                img.addEventListener('click', function () {
+                    modalImage.src = this.src;
+                    // Optionally, you can set the alt text for the modal image too
+                    // modalImage.alt = this.alt; 
+                    imageModal.show();
+                });
+            });
+
+            // Optional: Clear the image src when the modal is hidden to prevent showing old image briefly
+            document.getElementById('imageModal').addEventListener('hidden.bs.modal', function () {
+                modalImage.src = '';
+            });
+        });
+    </script>
+</body>
+</html>
