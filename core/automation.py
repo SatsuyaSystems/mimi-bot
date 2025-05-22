@@ -71,6 +71,7 @@ async def wait_for_response():
     logger.info(f"Found {response_count} response blocks.")
     image_path = None
     latest_response_text = None
+    formatted_code = None
 
     if response_count > 0:
         latest_response_block = response_blocks.nth(response_count - 1)
@@ -82,7 +83,7 @@ async def wait_for_response():
         code_element_locator = latest_response_block.locator('code-block').first # Get the first code block if multiple
         
         try:
-            if await image_element_locator.is_visible(timeout=5000): # Check if image is visible
+            if await image_element_locator.is_visible(timeout=500): # Check if image is visible
                 os.makedirs("temp", exist_ok=True)
                 temp_image_path = os.path.join("temp", "latest_image_screenshot.png")
                 await image_element_locator.screenshot(path=temp_image_path)
@@ -96,7 +97,7 @@ async def wait_for_response():
             image_path = None # Ensure image_path is None if screenshot fails
 
         try:
-            if await code_element_locator.is_visible(timeout=5000): # Check if code block is visible
+            if await code_element_locator.is_visible(timeout=500): # Check if code block is visible
                 code_text = await code_element_locator.inner_text()
                 if code_text.strip():
                     formatted_code = f"{code_text.strip()}"  # Format the code block
