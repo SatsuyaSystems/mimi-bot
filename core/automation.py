@@ -99,8 +99,8 @@ async def wait_for_response():
             if await code_element_locator.is_visible(timeout=5000): # Check if code block is visible
                 code_text = await code_element_locator.inner_text()
                 if code_text.strip():
-                    formatted_code = f"```{code_text.strip()}\n```"  # Format the code block
-                    latest_response_text = latest_response_text.replace(code_text, formatted_code)
+                    formatted_code = f"{code_text.strip()}"  # Format the code block
+                    latest_response_text = latest_response_text.replace(code_text, "")
                     logger.info("Code block found and formatted in the response text.")
             else:
                 logger.info("No visible code block found in the latest response block")
@@ -112,4 +112,4 @@ async def wait_for_response():
         logger.warning("No response blocks found.")
         latest_response_text = "No response content found."
 
-    return latest_response_text, image_path
+    return latest_response_text, image_path, formatted_code

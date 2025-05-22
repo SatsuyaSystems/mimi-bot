@@ -7,6 +7,7 @@ import discord
 import logging
 import os
 from lib.global_registry import g_data
+import io
 
 # Use a logger specific to this module
 logger = logging.getLogger(__name__)
@@ -22,6 +23,7 @@ async def mimi_callback(callback_object):
     channelId = callback_object['channel']
     content = callback_object['responce']
     image_path = callback_object.get('image')  # Get the image path if it exists
+    code = callback_object.get('code')  # Get the code if it exists
 
     # replace for codeblocks
     #content = content.replace(";;;", "```")  # Add a newline after code blocks
@@ -73,6 +75,15 @@ async def mimi_callback(callback_object):
                 logger.error(f"Failed to upload image: {e}")
         else:
             logger.warning(f"Image path does not exist: {image_path}")
+
+    # Check if there is a code block to upload
+    if code:
+        logger.info("Uploading code block to channel.")
+        try:
+            await src_channel.send(file=discord.File(fp=io.BytesIO(code.encode('utf-8')), filename="message.txt"))
+            logger.info("Code block uploaded successfully.")
+        except Exception as e:
+            logger.error(f"Failed to upload code block: {e}")
 
     logger.info("Mimi callback processing completed.")
 
