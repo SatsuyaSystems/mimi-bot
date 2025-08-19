@@ -2,6 +2,7 @@ from playwright.async_api import async_playwright
 import asyncio
 import logging
 import os
+import time
 
 # Global browser context and page
 context = None
@@ -47,12 +48,12 @@ async def send_to_website(content: str):
     await chat_input.fill(content)
     send_button_selector = '//button[contains(@class, "send-button")]'
     await page.locator(send_button_selector).click()
+    time.sleep(0.5)
 
 async def wait_for_response():
     """Wait for and return website response"""
     response_selector = '//message-content'
-    mic_selector = 'xpath=//*[@id="app-root"]/main/side-navigation-v2/bard-sidenav-container/bard-sidenav-content/div[2]/div/div[2]/chat-window/div/input-container/div/input-area-v2/div/div/div[3]/div/div[1]/speech-dictation-mic-button/button/div/mat-icon'
-  
+    mic_selector = '//button[contains(@class, "speech_dictation_mic_button")]'
     try:
         await page.locator(mic_selector).wait_for(state="visible", timeout=500000)
     except Exception as e:
